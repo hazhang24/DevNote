@@ -1,0 +1,169 @@
+# Technick Todo
+### Build und Deployment
+####Maven
+
+**Maven Lifezyclus**
+
+
+### Java
+
+
+### EJB
+
+
+### Transaction
+
+
+### File behandle
+
+
+### REST
+
+
+### SOAP
+
+
+WSDL to WS
+----------------
+Contract First in Eclipse
+wie ist die Projekt-Struktur?
+```
+package de.ba.apollo.dokumentenablage.impl;
+
+import java.util.List;
+import java.util.jar.Attributes;
+
+import javax.activation.DataHandler;
+import javax.ejb.Local;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import javax.jws.HandlerChain;
+import javax.jws.WebService;
+import javax.xml.ws.BindingType;
+import javax.xml.ws.Holder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.arbeitsagentur.basis.kundendokumenteablageservice.KundendokumenteAblageService_v_1.Dokument;
+import de.arbeitsagentur.basis.kundendokumenteablageservice.KundendokumenteAblageService_v_1.DokumentNichtGefundenFaultException;
+import de.arbeitsagentur.basis.kundendokumenteablageservice.KundendokumenteAblageService_v_1.DokumentenKategorie;
+import de.arbeitsagentur.basis.kundendokumenteablageservice.KundendokumenteAblageService_v_1.KundendokumenteAblageServicePortType;
+import de.arbeitsagentur.basis.kundendokumenteablageservice.KundendokumenteAblageService_v_1.KundendokumenteAblageServiceValidierungFaultException;
+import de.arbeitsagentur.services.types.common.serviceinfo_v_1.AdditionalInfo;
+import de.arbeitsagentur.services.types.common.serviceinfo_v_1.ServiceInfo;
+import de.ba.apollo.common.util.ServicePropertiesReader;
+import de.ba.apollo.dokumentenablage.exception.ApolloDokServiceException;
+import de.ba.apollo.interceptor.WebserviceCallInterceptor;
+import de.ba.apollo.webcenter.idc.service.IdcService;
+import de.ba.apollo.webcenter.idc.service.IdcServiceException;
+import de.ba.apollo.webcenter.idc.service.IdcServiceFactory;
+
+/**
+ * 
+ * <pre>
+ * Diese Klasse ist die Endpoint Implementierung des Dokumentenablage Service
+ * 
+ * Reviewed: [Datum des Reviews], [Reviewer]
+ * </pre>
+ * 
+ * @date 11.12.2014
+ * @author lechners007
+ */
+@Stateless
+@Local(KundendokumenteAblageServicePortType.class)
+@WebService(serviceName = "KundendokumenteAblageService_V_1", portName = "KundendokumenteAblageServicePort", 
+wsdlLocation = "wsdl/KundendokumenteAblageService_v_1_1.wsdl", 
+endpointInterface = "de.arbeitsagentur.basis.kundendokumenteablageservice.KundendokumenteAblageService_v_1.KundendokumenteAblageServicePortType", 
+targetNamespace = "http://services.dst.baintern.de/wsdl/kundendokumenteablageservice/KundendokumenteAblageService_V_1")
+@BindingType("http://schemas.xmlsoap.org/wsdl/soap/http")
+@Interceptors({ WebserviceCallInterceptor.class })
+@HandlerChain(file = "handler-chain.xml")
+public class DokumentenablageWebserviceImpl implements
+		KundendokumenteAblageServicePortType {
+
+	private static final String UNBEKANNT = "UNBEKANNT";
+
+	private static final String[] KONFIG_DATEIEN = {
+			"dokumentenablage.properties", "wccConnection.properties" };
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(DokumentenablageWebserviceImpl.class);
+
+	private final IdcService idcService;
+
+	public DokumentenablageWebserviceImpl() {
+		try {
+			idcService = IdcServiceFactory.getIdcServiceInstance();
+		} catch (final IdcServiceException e) {
+			throw new ApolloDokServiceException(e);
+		}
+	}
+	
+	@Override
+	public ServiceInfo getServiceInfo() {
+		ServiceInfo info = new ServiceInfo();
+		Attributes serviceProps = readAttributesFromManifest();
+		if (serviceProps != null) {
+			info.setServicename(serviceProps.getValue(ServicePropertiesReader.EXTENSION_NAME_KEY));
+			info.setWsversion(serviceProps.getValue(ServicePropertiesReader.IMPLEMENTATION_VERSION_KEY));
+		} else {
+			info.setServicename(UNBEKANNT);
+			info.setWsversion(UNBEKANNT);
+		}
+		info.setAdditionalInfo(new AdditionalInfo());
+		addKonfigDateienInhalte(info.getAdditionalInfo());
+		return info;
+	}
+
+	/**
+	 * Zum Überschreiben im Unit-Test
+	 */
+	Attributes readAttributesFromManifest() {
+		return ServicePropertiesReader.readProperties("dokumentenablage-service-ws");
+	}
+
+	private void addKonfigDateienInhalte(AdditionalInfo additionalInfo) {
+		
+	}
+
+	@Override
+	public boolean deleteDokument(long dokumentId) throws DokumentNichtGefundenFaultException {
+		return true;
+	}
+
+	@Override
+	public List<Dokument> findAllDokumenteByBenutzer(long benutzerId) {
+		LOGGER.debug("Dokumente des Benutzers mit der ID {} werden gesucht", benutzerId);
+		return null;
+	}
+
+	@Override
+	public List<Dokument> findAllDokumenteByBenutzerUndKategorie(long benutzerId, DokumentenKategorie kategorie) {
+	    return null;
+	}
+
+	@Override
+	public Dokument uploadDokument(DokumentenKategorie kategorie,
+			DataHandler dokumentInhalt, String extension, String name, long benutzerId)
+			throws KundendokumenteAblageServiceValidierungFaultException {
+	    return null;
+	}
+
+	@Override
+	public Dokument findDokumentById(long docId) {
+		return null;
+	}
+
+	@Override
+	public void readDokument(long docId, Holder<Dokument> doc, Holder<DataHandler> ausgabe)
+			throws DokumentNichtGefundenFaultException {
+	}
+
+	@Override
+	public Dokument setDokumentGelesen(long dokumentId, boolean gelesen) throws DokumentNichtGefundenFaultException {
+		return new Dokument();
+	}
+}
+```
+
+
